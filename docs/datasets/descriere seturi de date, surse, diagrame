@@ -85,20 +85,20 @@
 ---
 ##  5. Fișiere Generate în Această Etapă
 
-* `data/raw/` – date brute
-* `data/processed/` – date curățate & transformate
-* `data/train/`, `data/validation/`, `data/test/` – seturi finale
-* `src/preprocessing/` – codul de preprocesare
-* `data/README.md` – descrierea dataset-ului
+* `data/raw/` – Fișiere (CSV/Serial) ce conțin măsurătorile brute direct de la senzorul VL53L0X/VL6180X: distanță, intensitate, temperatură.
+* `data/processed/` – Fișiere cu date normalizate și filtrate (zgomot redus), pregătite pentru a fi introduse în rețeaua neuronală.
+* `data/train/`, `data/validation/`, `data/test/` – eturile de date împărțite, conținând perechi de valori (Input: Date Brute, Target: Distanță Reală) pentru antrenarea supravegheată.
+* `src/preprocessing/` – Scripturi Python (sau module LabVIEW) care implementează logica de curățare, filtrare și normalizare a datelor.
+* `data/README.md` – Documentația variabilelor (ex: unități de măsură mm/°C) și descrierea condițiilor experimentale de colectare.
 
 ---
 
 ##  6. Stare Etapă (de completat de student)
 
-- [ ] Structură repository configurată
-- [ ] Dataset analizat (EDA realizată)
-- [ ] Date preprocesate
-- [ ] Seturi train/val/test generate
-- [ ] Documentație actualizată în README + `data/README.md`
+- [ ] Structură repository configurată : Organizarea folderelor pentru codul Python/LabVIEW și date, fie pe PC, fie pe Raspberry Pi.
+- [ ] Dataset analizat (EDA realizată) : Identificarea nivelului de zgomot actual și a erorilor pe suprafețe reflectorizante pentru a stabili referința de îmbunătățire.
+- [ ] Date preprocesate : Rularea algoritmilor de normalizare și filtrare pentru a aduce datele într-un format compatibil cu modelul MLP/CNN.
+- [ ] Seturi train/val/test generate : Separarea datelor colectate (brut vs. ground truth) în subseturi pentru antrenare și validare.
+- [ ] Documentație actualizată în README + `data/README.md` : Descrierea fluxului de date: Senzor -> Microcontroler -> Preprocesare -> Model.
 
 ---
