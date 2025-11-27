@@ -5,7 +5,7 @@
 ### 2.1 Sursa datelor
 
 * **Origine:** Date achiziționate de la procesul real, folosind un senzor TOF
-* **Modul de achiziție:** ☐ Senzori reali
+* **Modul de achiziție:** Senzori reali
 * **Perioada / condițiile colectării:** Mediul controlat cu obstacole la distanțe fixe, incluzând variații de lumină și suprafețe reflectorizante.
 
 ### 2.2 Caracteristicile dataset-ului
