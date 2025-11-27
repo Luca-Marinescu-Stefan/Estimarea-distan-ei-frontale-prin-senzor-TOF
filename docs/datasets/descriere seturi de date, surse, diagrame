@@ -83,3 +83,22 @@
 * Parametrii de preprocesare în `config/preprocessing_config.*` Parametrii de normalizare și filtrare sunt definiți în modulul software de preprocesare (cod Python sau blocuri LabVIEW) și pot fi gestionați de administratorul de sistem.
 
 ---
+##  5. Fișiere Generate în Această Etapă
+
+* `data/raw/` – date brute
+* `data/processed/` – date curățate & transformate
+* `data/train/`, `data/validation/`, `data/test/` – seturi finale
+* `src/preprocessing/` – codul de preprocesare
+* `data/README.md` – descrierea dataset-ului
+
+---
+
+##  6. Stare Etapă (de completat de student)
+
+- [ ] Structură repository configurată
+- [ ] Dataset analizat (EDA realizată)
+- [ ] Date preprocesate
+- [ ] Seturi train/val/test generate
+- [ ] Documentație actualizată în README + `data/README.md`
+
+---
