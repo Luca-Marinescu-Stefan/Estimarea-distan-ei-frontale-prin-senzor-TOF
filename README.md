@@ -47,3 +47,4 @@ project-name/
 ```
 
 ---
+<img width="600" height="472" alt="Diagram drawio" src="https://github.com/user-attachments/assets/a1c7d1bd-38b3-41d1-8d41-aaf20a57ac37" />
