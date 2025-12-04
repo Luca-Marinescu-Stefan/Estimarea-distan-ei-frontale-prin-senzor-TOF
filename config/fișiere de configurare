@@ -41,7 +41,7 @@ Iată propunerea de completare pentru secțiunile 2, 3 și 4, bazată strict pe 
 
     Origine: Date achiziționate de la procesul real, folosind un senzor TOF (VL53L0X sau VL6180X).
 
-Modul de achiziție: ☑ Senzori reali (compararea măsurătorilor TOF cu distanțele reale măsurate cu riglă/laser de referință).
+Modul de achiziție:  Senzori reali (compararea măsurătorilor TOF cu distanțele reale măsurate cu riglă/laser de referință).
 
 Perioada / condițiile colectării: Mediul controlat cu obstacole la distanțe fixe, incluzând variații de lumină și suprafețe reflectorizante.
 
@@ -51,9 +51,9 @@ Perioada / condițiile colectării: Mediul controlat cu obstacole la distanțe f
 
     Număr de caracteristici (features): 3 intrări principale + 1 ieșire (target).
 
-Tipuri de date: ☑ Numerice (distanță, intensitate, temperatură).
+Tipuri de date:  Numerice (distanță, intensitate, temperatură).
 
-Format fișiere: ☑ CSV / ☑ Serial.
+Format fișiere:  CSV /  Serial.
 
 2.3 Descrierea fiecărei caracteristici
 Caracteristică	Tip	Unitate	Descriere	Rol
