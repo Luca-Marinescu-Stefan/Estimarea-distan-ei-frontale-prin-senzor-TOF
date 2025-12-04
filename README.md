@@ -9,7 +9,19 @@
 
 ## Introducere
 
-Acest document descrie activitățile realizate în **Etapa 3**, în care se analizează și se preprocesează setul de date necesar proiectului „Rețele Neuronale". Scopul etapei este pregătirea corectă a datelor pentru instruirea modelului RN, respectând bunele practici privind calitatea, consistența și reproductibilitatea datelor.
+Acest proiect implementează un sistem inteligent de măsurare a distanței (SIA) care combină un senzor Time-of-Flight (VL53L0X) cu o rețea neuronală artificială. Scopul este corectarea erorilor neliniare și reducerea zgomotului de măsurare, în special pe suprafețe reflectorizante și în condiții variabile de lumină.
+
+### Obiective
+
+* Achiziția datelor brute (distanță, intensitate semnal, temperatură).
+* Creșterea preciziei măsurătorilor cu 15–25%.
+* Reducerea zgomotului de măsurare cu aprox. 40%.
+
+## Arhitectura Sistemului
+
+1. **Hardware:** Senzor VL53L0X + Microcontroler (Arduino/RPi).
+2. **Software:** Python pentru preprocesare și TensorFlow/Keras pentru modelul neuronal (MLP).
+3. **Flux date:** Senzor -> Procesare Serială -> Preprocesare -> Rețea Neuronală -> Distanță Estimată.
 
 ---
 
