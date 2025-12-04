@@ -1,175 +1,104 @@
-2. Descrierea Setului de Date
-2.1 Sursa datelor
+---
 
-    Origine: Date achiziționate de la procesul real, folosind un senzor TOF (VL53L0X sau VL6180X).
+##  2. Descrierea Setului de Date
 
-Modul de achiziție: Senzori reali (compararea măsurătorilor TOF cu distanțele reale măsurate cu riglă/laser de referință).
+### 2.1 Sursa datelor
 
-Perioada / condițiile colectării: Mediul controlat cu obstacole la distanțe fixe, incluzând variații de lumină și suprafețe reflectorizante.
+* **Origine:** Date achiziționate de la procesul real, folosind un senzor TOF
+* **Modul de achiziție:** Senzori reali
+* **Perioada / condițiile colectării:** Mediul controlat cu obstacole la distanțe fixe, incluzând variații de lumină și suprafețe reflectorizante.
 
-2.2 Caracteristicile dataset-ului
+### 2.2 Caracteristicile dataset-ului
 
-    Număr total de observații: [A se completa după colectare - ex: 5000 perechi de măsurători]
+* **Număr total de observații:** 5000 perechi de măsurători
+* **Număr de caracteristici (features):** 3 intrări principale + 1 ieșire
+* **Tipuri de date:** Numerice
+* **Format fișiere:** CSV / Serial
 
-    Număr de caracteristici (features): 3 intrări principale + 1 ieșire (target).
+### 2.3 Descrierea fiecărei caracteristici
 
-Tipuri de date: Numerice (distanță, intensitate, temperatură).
+| **Caracteristică** | **Tip** | **Unitate** | **Descriere** | **Domeniu valori** |
+|-------------------|---------|-------------|---------------|--------------------|
+| Distanță brută | numeric | mm | Valoarea măsurată direct de senzorul TOF | Intrare (Input) |
+| Intensitate semnal | Numeric | mcps/lux | Intensitatea semnalului optic întors | Intrare (Input) |
+| Temperatură | numeric | °C | Temperatura senzorului, care poate afecta calibrarea. |Intrare (Input) |
+| Distanță reală | Numeric | mm | Ground Truth - măsurată cu instrument de referință | Ieșire (Target) |
 
-Format fișiere: CSV /  Serial.
+**Fișier recomandat:**  `data/README.md`
 
-2.3 Descrierea fiecărei caracteristici
-Distanță brută	Numeric	mm	
-Valoarea măsurată direct de senzorul TOF.
-Intrare (Input)
+---
 
-Intensitate semnal	Numeric	mcps/lux	
-Intensitatea semnalului optic întors (relevantă pentru suprafețe reflectorizante).
-	Intrare (Input)
+##  3. Analiza Exploratorie a Datelor (EDA) – Sintetic
 
-Temperatură	Numeric	°C	
-Temperatura senzorului, care poate afecta calibrarea.
-	Intrare (Input)
+### 3.1 Statistici descriptive aplicate
 
-Distanță reală	Numeric	mm	
-Ground Truth - măsurată cu instrument de referință (laser/riglă).
-	Ieșire (Target)
-Salut! Analizând prezentarea încărcată, am extras informațiile relevante pentru a completa secțiunile tehnice din documentația ta. Proiectul se concentrează pe corectarea erorilor senzorilor TOF folosind rețele neuronale, iar datele sunt generate experimental.
+* **Medie, mediană, deviație standard** Calculăm media erorilor pentru a vedea bias-ul senzorului și deviația standard pentru a cuantifica zgomotul ce trebuie redus .
+* **Min–max și quartile** Analizăm intervalul maxim de fluctuație a citirilor la o distanță fixă pentru a determina instabilitatea .
+* **Distribuții pe caracteristici** (histograme) Verificăm histograma erorilor; o formă neregulată justifică necesitatea unei rețele neuronale în locul filtrelor simple .
+* **Identificarea outlierilor** (IQR / percentile) Detectăm vârfurile de eroare cauzate de reflexii sau lumină ambientală puternică .
 
-Iată propunerea de completare pentru secțiunile 2, 3 și 4, bazată strict pe informațiile din fișier:
-2. Descrierea Setului de Date
-2.1 Sursa datelor
+### 3.2 Analiza calității datelor
 
-    Origine: Date achiziționate de la procesul real, folosind un senzor TOF (VL53L0X sau VL6180X).
+* **Detectarea valorilor lipsă** Monitorizăm erorile de comunicare (I2C) sau momentele de "timeout" ale senzorului .
+* **Detectarea valorilor inconsistente sau eronate** Identificăm măsurătorile care fluctuează ilogic deși senzorul și obstacolul sunt imobile .
+* **Identificarea caracteristicilor redundante sau puternic corelate** Verificăm prin corelație cât de mult influențează Intensitatea și Temperatura eroarea finală .
 
-Modul de achiziție:  Senzori reali (compararea măsurătorilor TOF cu distanțele reale măsurate cu riglă/laser de referință).
+### 3.3 Probleme identificate
 
-Perioada / condițiile colectării: Mediul controlat cu obstacole la distanțe fixe, incluzând variații de lumină și suprafețe reflectorizante.
+* Zgomot pe suprafețe reflectorizante: Măsurătorile brute au variații mari (zgomot) atunci când obstacolul este lucios.
+* Instabilitate la lumină: Precizia senzorului scade semnificativ atunci când lumina ambientală variază.
+* Erori de calibrare: Există discrepanțe și erori de calibrare între diferiți senzori care afectează acuratețea.
 
-2.2 Caracteristicile dataset-ului
+---
 
-    Număr total de observații: [A se completa după colectare - ex: 5000 perechi de măsurători]
+##  4. Preprocesarea Datelor
 
-    Număr de caracteristici (features): 3 intrări principale + 1 ieșire (target).
+### 4.1 Curățarea datelor
 
-Tipuri de date:  Numerice (distanță, intensitate, temperatură).
+* **Eliminare duplicatelor** Nu se aplică (datele sunt citite în flux continuu/timp real) .
+* **Tratarea valorilor lipsă:** Se ignoră pachetele de date incomplete rezultate din erori de comunicare I2C .
+  * Feature A: imputare cu mediană
+  * Feature B: eliminare (30% valori lipsă)
+* **Tratarea outlierilor:** Se elimină zgomotul și erorile grosolane de măsurare folosind filtre software (înainte de rețea) .
+### 4.2 Transformarea caracteristicilor
 
-Format fișiere:  CSV /  Serial.
+* **Normalizare:** Datele de intrare (distanță, intensitate, temperatură) sunt normalizate pentru a fi procesate de modelul neuronal .
+* **Encoding pentru variabile categoriale** Nu este necesar (toate datele sunt numerice: mm, grade, intensitate) .
+* **Ajustarea dezechilibrului de clasă** Datele sunt colectate controlat la distanțe fixe pentru a asigura o distribuție uniformă .
 
-2.3 Descrierea fiecărei caracteristici
-Caracteristică	Tip	Unitate	Descriere	Rol
-Distanță brută	Numeric	mm	
+### 4.3 Structurarea seturilor de date
 
-Valoarea măsurată direct de senzorul TOF.
+**Împărțire recomandată:**
+*Datele sunt organizate în perechi (Input: Valori Brute, Target: Distanță Reală) pentru antrenare supravegheată .
 
-	Intrare (Input)
-Intensitate semnal	Numeric	mcps/lux	
+**Principii respectate:**
+* Stratificare pentru clasificare
+* Fără scurgere de informație (data leakage)
+* Statistici calculate DOAR pe train și aplicate pe celelalte seturi
 
-Intensitatea semnalului optic întors (relevantă pentru suprafețe reflectorizante).
+### 4.4 Salvarea rezultatelor preprocesării
 
-	Intrare (Input)
-Temperatură	Numeric	°C	
+* Date preprocesate în `data/processed/` Datele filtrate și normalizate sunt salvate în format CSV pentru a fi compatibile cu mediul de antrenare .
+* Seturi train/val/test în foldere dedicate Datele sunt structurate în seturi de intrare (măsurători brute) și ieșire (distanță reală), fiind gestionate direct în scripturile Python (TensorFlow/Keras) sau salvate în fișiere separate.
+* Parametrii de preprocesare în `config/preprocessing_config.*` Parametrii de normalizare și filtrare sunt definiți în modulul software de preprocesare (cod Python sau blocuri LabVIEW) și pot fi gestionați de administratorul de sistem.
 
-Temperatura senzorului, care poate afecta calibrarea.
+---
+##  5. Fișiere Generate în Această Etapă
 
-	Intrare (Input)
-Distanță reală	Numeric	mm	
+* `data/raw/` – Fișiere (CSV/Serial) ce conțin măsurătorile brute direct de la senzorul VL53L0X/VL6180X: distanță, intensitate, temperatură.
+* `data/processed/` – Fișiere cu date normalizate și filtrate (zgomot redus), pregătite pentru a fi introduse în rețeaua neuronală.
+* `data/train/`, `data/validation/`, `data/test/` – eturile de date împărțite, conținând perechi de valori (Input: Date Brute, Target: Distanță Reală) pentru antrenarea supravegheată.
+* `src/preprocessing/` – Scripturi Python (sau module LabVIEW) care implementează logica de curățare, filtrare și normalizare a datelor.
+* `data/README.md` – Documentația variabilelor (ex: unități de măsură mm/°C) și descrierea condițiilor experimentale de colectare.
 
-Ground Truth - măsurată cu instrument de referință (laser/riglă).
+---
 
-	Ieșire (Target)
+##  6. Stare Etapă (de completat de student)
 
-Fișier recomandat: data/README.md
+- [ ] Structură repository configurată : Organizarea folderelor pentru codul Python/LabVIEW și date, fie pe PC, fie pe Raspberry Pi.
+- [ ] Dataset analizat (EDA realizată) : Identificarea nivelului de zgomot actual și a erorilor pe suprafețe reflectorizante pentru a stabili referința de îmbunătățire.
+- [ ] Date preprocesate : Rularea algoritmilor de normalizare și filtrare pentru a aduce datele într-un format compatibil cu modelul MLP/CNN.
+- [ ] Seturi train/val/test generate : Separarea datelor colectate (brut vs. ground truth) în subseturi pentru antrenare și validare.
+- [ ] Documentație actualizată în README + `data/README.md` : Descrierea fluxului de date: Senzor -> Microcontroler -> Preprocesare -> Model.
 
-3. Analiza Exploratorie a Datelor (EDA)
-3.1 Statistici descriptive aplicate
-
-    Medie, mediană, deviație standard: Calculăm media erorilor pentru a vedea bias-ul senzorului și deviația standard pentru a cuantifica zgomotul ce trebuie redus .
-
-    Min–max și quartile: Analizăm intervalul maxim de fluctuație a citirilor la o distanță fixă pentru a determina instabilitatea .
-
-    Distribuții pe caracteristici (histograme): Verificăm histograma erorilor; o formă neregulată justifică necesitatea unei rețele neuronale în locul filtrelor simple .
-
-    Identificarea outlierilor: Detectăm vârfurile de eroare cauzate de reflexii sau lumină ambientală puternică .
-
-3.2 Analiza calității datelor
-
-    Detectarea valorilor lipsă: Monitorizăm erorile de comunicare (I2C) sau momentele de "timeout" ale senzorului .
-
-    Detectarea valorilor inconsistente: Identificăm măsurătorile care fluctuează ilogic deși senzorul și obstacolul sunt imobile .
-
-    Identificarea caracteristicilor redundante: Verificăm prin corelație cât de mult influențează Intensitatea și Temperatura eroarea finală .
-
-3.3 Probleme identificate
-
-    Zgomot pe suprafețe reflectorizante: Măsurătorile brute au variații mari (zgomot) atunci când obstacolul este lucios.
-
-Instabilitate la lumină: Precizia senzorului scade semnificativ atunci când lumina ambientală variază.
-
-Erori de calibrare: Există discrepanțe și erori de calibrare între diferiți senzori care afectează acuratețea.
-
-4. Preprocesarea Datelor
-4.1 Curățarea datelor
-
-    Eliminare duplicatelor: Nu se aplică (datele sunt citite în flux continuu/timp real) .
-
-    Tratarea valorilor lipsă: Se ignoră pachetele de date incomplete rezultate din erori de comunicare I2C .
-
-    Tratarea outlierilor: Se elimină zgomotul și erorile grosolane de măsurare folosind filtre software (înainte de rețea) .
-
-4.2 Transformarea caracteristicilor
-
-    Normalizare: Datele de intrare (distanță, intensitate, temperatură) sunt normalizate pentru a fi procesate de modelul neuronal .
-
-    Encoding: Nu este necesar (toate datele sunt numerice: mm, grade, intensitate) .
-
-    Ajustarea dezechilibrului: Datele sunt colectate controlat la distanțe fixe pentru a asigura o distribuție uniformă .
-
-4.3 Structurarea seturilor de date
-
-    Strategia de împărțire: Datele sunt organizate în perechi (Input: Valori Brute, Target: Distanță Reală) pentru antrenare supravegheată .
-4.4 Salvarea rezultatelor preprocesării
-
-    Date preprocesate în data/processed/:
-
-        Datele filtrate și normalizate sunt salvate în format CSV pentru a fi compatibile cu mediul de antrenare (Python/Pandas).
-
-Seturi train/val/test în foldere dedicate:
-
-    Datele sunt structurate în seturi de intrare (măsurători brute) și ieșire (distanță reală), fiind gestionate direct în scripturile Python (TensorFlow/Keras) sau salvate în fișiere separate.
-
-Parametrii de preprocesare în config/preprocessing_config.*:
-
-    Parametrii de normalizare și filtrare sunt definiți în modulul software de preprocesare (cod Python sau blocuri LabVIEW) și pot fi gestionați de administratorul de sistem.
-5. Fișiere Generate în Această Etapă
-
-    data/raw/ – Conținut: Fișiere (CSV/Serial) ce conțin măsurătorile brute direct de la senzorul VL53L0X/VL6180X: distanță, intensitate, temperatură.
-
-data/processed/ – Conținut: Fișiere cu date normalizate și filtrate (zgomot redus), pregătite pentru a fi introduse în rețeaua neuronală.
-
-data/train/, data/validation/, data/test/ – Conținut: Seturile de date împărțite, conținând perechi de valori (Input: Date Brute, Target: Distanță Reală) pentru antrenarea supravegheată.
-
-src/preprocessing/ – Conținut: Scripturi Python (sau module LabVIEW) care implementează logica de curățare, filtrare și normalizare a datelor.
-
-data/README.md – Conținut: Documentația variabilelor (ex: unități de măsură mm/°C) și descrierea condițiilor experimentale de colectare.
-
-6. Stare Etapă (Acțiuni necesare conform proiectului)
-
-    Structură repository configurată:
-
-         Organizarea folderelor pentru codul Python/LabVIEW și date, fie pe PC, fie pe Raspberry Pi.
-
-Dataset analizat (EDA realizată):
-
-     Identificarea nivelului de zgomot actual și a erorilor pe suprafețe reflectorizante pentru a stabili referința de îmbunătățire.
-
-Date preprocesate:
-
-     Rularea algoritmilor de normalizare și filtrare pentru a aduce datele într-un format compatibil cu modelul MLP/CNN.
-
-Seturi train/val/test generate:
-
-     Separarea datelor colectate (brut vs. ground truth) în subseturi pentru antrenare și validare.
-
-Documentație actualizată în README + data/README.md:
-
-     Descrierea fluxului de date: Senzor -> Microcontroler -> Preprocesare -> Model.
+---
