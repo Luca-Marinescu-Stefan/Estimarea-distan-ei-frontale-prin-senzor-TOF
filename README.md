@@ -45,5 +45,5 @@ project-name/
 ├── config/                # fișiere de configurare
 └── requirements.txt       # dependențe Python (dacă aplicabil)
 ```
-<img width="4372" height="3144" alt="image" src="https://github.com/user-attachments/assets/a121c59f-8804-49e7-aab6-d3f35c6574ed" />
+<img width="603" height="662" alt="image" src="https://github.com/user-attachments/assets/9c80709a-8f99-4ce3-9085-6f4cfc7d563f" />
 
