@@ -1,4 +1,4 @@
-<img width="4372" height="3144" alt="image" src="https://github.com/user-attachments/assets/58d69981-e7c4-4a8b-ba89-55cc79198614" /># 📘 README – Etapa 3: Analiza și Pregătirea Setului de Date pentru Rețele Neuronale
+# 📘 README – Etapa 3: Analiza și Pregătirea Setului de Date pentru Rețele Neuronale
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
