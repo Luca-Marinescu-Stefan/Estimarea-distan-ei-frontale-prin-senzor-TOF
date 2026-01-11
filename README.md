@@ -46,4 +46,16 @@ project-name/
 └── requirements.txt       # dependențe Python (dacă aplicabil)
 ```
 <img width="603" height="662" alt="image" src="https://github.com/user-attachments/assets/9c80709a-8f99-4ce3-9085-6f4cfc7d563f" />
+ 
+---
+
+## Documentație dataset
+
+- Descriere detaliată și instrucțiuni de preprocesare: [data/README.md](data/README.md)
+- Analiză și pregătire (Etapa 3): [docs/etapa3.md](docs/etapa3.md)
+- Arhitectura aplicației (Etapa 4): [README_Etapa4_Arhitectura_SIA.md](README_Etapa4_Arhitectura_SIA.md)
+- Antrenare model (Etapa 5): [README_Etapa5_Antrenare_RN.md](README_Etapa5_Antrenare_RN.md)
+- Schelet proiect: am adăugat scripturi de generare, preprocesare, model, training/eval și UI stub. Vezi `src/` și `data/`.
+
+---
 
