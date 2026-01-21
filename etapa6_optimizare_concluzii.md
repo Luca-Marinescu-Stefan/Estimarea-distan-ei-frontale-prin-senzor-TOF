@@ -17,7 +17,7 @@ Această etapă corespunde punctelor **7. Analiza performanței și optimizarea 
 
 ## PREREQUISITE – Verificare Etapa 5 (OBLIGATORIU)
 
-- [x] Model antrenat salvat în `models/trained_model.joblib`
+- [x] Model antrenat salvat în `models/trained_model.h5`
 - [x] Metrici baseline în `results/test_metrics.json`
 - [x] `results/training_history.csv`
 - [x] UI funcțional (`src/app/main.py`)

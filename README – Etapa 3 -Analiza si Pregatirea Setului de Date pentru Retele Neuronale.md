@@ -2,8 +2,8 @@
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
-**Student:** [Nume Prenume]  
-**Data:** [Data]  
+**Student:** Marinescu Luca-Stefan  
+**Data:** 21/01/2026  
 
 ---
 
@@ -40,25 +40,27 @@ project-name/
 
 ### 2.1 Sursa datelor
 
-* **Origine:** [Descriere sursă date - ex: senzori robot, dataset public, simulare]
-* **Modul de achiziție:** ☐ Senzori reali / ☐ Simulare / ☐ Fișier extern / ☐ Generare programatică
-* **Perioada / condițiile colectării:** [Ex: Noiembrie 2024 - Ianuarie 2025, condiții experimentale specifice]
+* **Origine:** Date generate programatic (simulare) + date brute colectate în CSV
+* **Modul de achiziție:** ☐ Senzori reali / ☑ Simulare / ☑ Fișier extern / ☑ Generare programatică
+* **Perioada / condițiile colectării:** Ianuarie 2026, condiții simulate pentru senzor TOF
 
 ### 2.2 Caracteristicile dataset-ului
 
-* **Număr total de observații:** [Ex: 15,000]
-* **Număr de caracteristici (features):** [Ex: 12]
-* **Tipuri de date:** ☐ Numerice / ☐ Categoriale / ☐ Temporale / ☐ Imagini
-* **Format fișiere:** ☐ CSV / ☐ TXT / ☐ JSON / ☐ PNG / ☐ Altele: [...]
+* **Număr total de observații:** 503 (după curățare și filtrare)
+* **Număr de caracteristici (features):** 5 (+ label)
+* **Tipuri de date:** ☑ Numerice / ☑ Temporale
+* **Format fișiere:** ☑ CSV
 
 ### 2.3 Descrierea fiecărei caracteristici
 
 | **Caracteristică** | **Tip** | **Unitate** | **Descriere** | **Domeniu valori** |
 |-------------------|---------|-------------|---------------|--------------------|
-| feature_1 | numeric | mm | [...] | 0–150 |
-| feature_2 | categorial | – | [...] | {A, B, C} |
-| feature_3 | numeric | m/s | [...] | 0–2.5 |
-| ... | ... | ... | ... | ... |
+| timestamp | temporal | ISO | Momentul măsurării | – |
+| distance_raw | numeric | mm | Distanța brută măsurată de senzor | 50–2000 |
+| signal_strength | numeric | – | Intensitate semnal TOF | 0–300 |
+| temperature | numeric | °C | Temperatură senzor | 20–40 |
+| distance_ref | numeric | mm | Distanța de referință | 50–2000 |
+| label | categorial | – | Clasa distanței (binned) | {0..4} |
 
 **Fișier recomandat:**  `data/README.md`
 
@@ -81,9 +83,8 @@ project-name/
 
 ### 3.3 Probleme identificate
 
-* [exemplu] Feature X are 8% valori lipsă
-* [exemplu] Distribuția feature Y este puternic neuniformă
-* [exemplu] Variabilitate ridicată în clase (class imbalance)
+* Unele fișiere brute aveau valori lipsă în `distance_ref` → eliminate la combinare
+* Distribuția claselor este ușor neuniformă (clasele extreme au mai puține exemple)
 
 ---
 
@@ -135,10 +136,10 @@ project-name/
 
 ##  6. Stare Etapă (de completat de student)
 
-- [ ] Structură repository configurată
-- [ ] Dataset analizat (EDA realizată)
-- [ ] Date preprocesate
-- [ ] Seturi train/val/test generate
-- [ ] Documentație actualizată în README + `data/README.md`
+- [x] Structură repository configurată
+- [x] Dataset analizat (EDA realizată)
+- [x] Date preprocesate
+- [x] Seturi train/val/test generate
+- [x] Documentație actualizată în README + `data/README.md`
 
 ---

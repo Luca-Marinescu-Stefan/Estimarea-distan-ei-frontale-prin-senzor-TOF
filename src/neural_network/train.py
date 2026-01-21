@@ -65,26 +65,45 @@ def save_hyperparams(path: Path, params: dict) -> None:
     path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
 
-def prepare_features(train: pd.DataFrame, val: pd.DataFrame, features: list[str]) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    scaler_path = Path('config/preprocessing_params.pkl')
-    if scaler_path.exists():
-        payload = joblib.load(scaler_path)
-        scaler = payload.get('scaler') if isinstance(payload, dict) else payload
-    else:
-        scaler = StandardScaler()
-        scaler.fit(train[features].fillna(0).values)
-        scaler_path.parent.mkdir(parents=True, exist_ok=True)
-        joblib.dump({'scaler': scaler, 'features': features}, scaler_path)
-        Path('config/preprocessing_params.json').write_text(
-            json.dumps({'scaler': 'StandardScaler', 'features': features}, indent=2),
-            encoding='utf-8'
-        )
+def _is_already_scaled(X: np.ndarray) -> bool:
+    if X.size == 0:
+        return False
+    mean_abs = float(np.abs(X.mean(axis=0)).mean())
+    std = X.std(axis=0)
+    std_mean = float(np.mean(std)) if std.size else 0.0
+    return mean_abs < 0.05 and 0.8 <= std_mean <= 1.2
 
-    X_train = scaler.transform(train[features].fillna(0).values)
-    X_val = scaler.transform(val[features].fillna(0).values)
+
+def prepare_features(train: pd.DataFrame, val: pd.DataFrame, features: list[str]) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, bool]:
+    X_train_raw = train[features].fillna(0).values
+    X_val_raw = val[features].fillna(0).values
+
+    if _is_already_scaled(X_train_raw):
+        X_train = X_train_raw
+        X_val = X_val_raw
+        scaled = True
+    else:
+        scaler_path = Path('config/preprocessing_params.pkl')
+        if scaler_path.exists():
+            payload = joblib.load(scaler_path)
+            scaler = payload.get('scaler') if isinstance(payload, dict) else payload
+        else:
+            scaler = StandardScaler()
+            scaler.fit(X_train_raw)
+            scaler_path.parent.mkdir(parents=True, exist_ok=True)
+            joblib.dump({'scaler': scaler, 'features': features}, scaler_path)
+            Path('config/preprocessing_params.json').write_text(
+                json.dumps({'scaler': 'StandardScaler', 'features': features}, indent=2),
+                encoding='utf-8'
+            )
+
+        X_train = scaler.transform(X_train_raw)
+        X_val = scaler.transform(X_val_raw)
+        scaled = True
+
     y_train = train['label'].astype(int).values
     y_val = val['label'].astype(int).values
-    return X_train, y_train, X_val, y_val
+    return X_train, y_train, X_val, y_val, scaled
 
 
 def main() -> None:
@@ -95,7 +114,7 @@ def main() -> None:
     train, val = load_datasets()
     features = ['distance_raw', 'signal_strength', 'temperature']
 
-    X_train, y_train, X_val, y_val = prepare_features(train, val, features)
+    X_train, y_train, X_val, y_val, scaled = prepare_features(train, val, features)
 
     if args.backend == 'keras':
         try:
@@ -166,6 +185,7 @@ def main() -> None:
             'dropout': args.dropout,
             'early_stopping': args.early_stopping,
             'reduce_lr': args.reduce_lr,
+            'input_scaled': scaled,
         }
         save_hyperparams(Path('results/hyperparameters.yaml'), hyperparams)
 

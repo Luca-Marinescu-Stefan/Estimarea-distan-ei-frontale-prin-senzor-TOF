@@ -2,9 +2,9 @@
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
-**Student:** [Nume Prenume]  
+**Student:** Marinescu Luca-Stefan  
 **Link Repository GitHub:** [URL complet]  
-**Data predării:** [Data]
+**Data predării:** 21/01/2026
 
 ---
 
@@ -97,12 +97,12 @@ Completați tabelul cu hiperparametrii folosiți și **justificați fiecare aleg
 
 | **Hiperparametru** | **Valoare Aleasă** | **Justificare** |
 |--------------------|-------------------|-----------------|
-| Learning rate | Ex: 0.001 | Valoare standard pentru Adam optimizer, asigură convergență stabilă |
-| Batch size | Ex: 32 | Compromis memorie/stabilitate pentru N=[numărul vostru] samples |
-| Number of epochs | Ex: 50 | Cu early stopping după 10 epoci fără îmbunătățire |
-| Optimizer | Ex: Adam | Adaptive learning rate, potrivit pentru RN cu [numărul vostru] straturi |
-| Loss function | Ex: Categorical Crossentropy | Clasificare multi-class cu K=[numărul vostru] clase |
-| Activation functions | Ex: ReLU (hidden), Softmax (output) | ReLU pentru non-linearitate, Softmax pentru probabilități clase |
+| Learning rate | 0.001 | Valoare standard Adam, convergență stabilă |
+| Batch size | 32 | Compromis memorie/stabilitate pentru N=352 train samples |
+| Number of epochs | 50 | Early stopping activ, oprire la nevoie |
+| Optimizer | Adam | Adaptive learning rate, potrivit pentru MLP | 
+| Loss function | Sparse Categorical Crossentropy | Clasificare multi-class (5 clase) |
+| Activation functions | ReLU (hidden), Softmax (output) | Non-linearitate + probabilități clase |
 
 **Justificare detaliată batch size (exemplu):**
 ```
@@ -343,7 +343,7 @@ python src/preprocessing/data_splitter.py --stratify --random_state 42
 ### 3. Antrenare model
 
 ```bash
-python src/neural_network/train.py --epochs 50 --batch_size 32 --early_stopping
+python src/neural_network/train.py --backend keras --epochs 50 --batch-size 32 --early-stopping --reduce-lr
 
 # Output așteptat:
 # Epoch 1/50 - loss: 0.8234 - accuracy: 0.6521 - val_loss: 0.7891 - val_accuracy: 0.6823
@@ -358,12 +358,17 @@ python src/neural_network/train.py --epochs 50 --batch_size 32 --early_stopping
 ```bash
 python src/neural_network/evaluate.py --model models/trained_model.h5
 
-# Output așteptat:
-# Test Accuracy: 0.7823
-# Test F1-score (macro): 0.7456
+# Output obținut:
+# Test Accuracy: 0.9737
+# Test F1-score (macro): 0.9741
 # ✓ Metrics saved to results/test_metrics.json
-# ✓ Confusion matrix saved to docs/confusion_matrix.png
 ```
+
+**Rezultate reale (test set):**
+- Accuracy: 0.9737
+- F1-macro: 0.9741
+- Precision-macro: 0.9800
+- Recall-macro: 0.9714
 
 ### 5. Lansare UI cu model antrenat
 
@@ -385,36 +390,36 @@ streamlit run src/app/main.py
 ## Checklist Final – Bifați Totul Înainte de Predare
 
 ### Prerequisite Etapa 4 (verificare)
-- [ ] State Machine există și e documentat în `docs/state_machine.*`
-- [ ] Contribuție ≥40% date originale verificabilă în `data/generated/`
-- [ ] Cele 3 module din Etapa 4 funcționale
+- [x] State Machine există și e documentat în `docs/state_machine.*`
+- [x] Contribuție ≥40% date originale verificabilă în `data/generated/`
+- [x] Cele 3 module din Etapa 4 funcționale
 
 ### Preprocesare și Date
-- [ ] Dataset combinat (vechi + nou) preprocesat (dacă ați adăugat date)
-- [ ] Split train/val/test: 70/15/15% (verificat dimensiuni fișiere)
-- [ ] Scaler din Etapa 3 folosit consistent (`config/preprocessing_params.pkl`)
+- [x] Dataset combinat (vechi + nou) preprocesat (dacă ați adăugat date)
+- [x] Split train/val/test: 70/15/15% (verificat dimensiuni fișiere)
+- [x] Scaler din Etapa 3 folosit consistent (`config/preprocessing_params.pkl`)
 
 ### Antrenare Model - Nivel 1 (OBLIGATORIU)
-- [ ] Model antrenat de la ZERO (nu fine-tuning pe model pre-antrenat)
-- [ ] Minimum 10 epoci rulate (verificabil în `results/training_history.csv`)
-- [ ] Tabel hiperparametri + justificări completat în acest README
-- [ ] Metrici calculate pe test set: **Accuracy ≥65%**, **F1 ≥0.60**
-- [ ] Model salvat în `models/trained_model.h5` (sau .pt, .lvmodel)
-- [ ] `results/training_history.csv` există cu toate epoch-urile
+- [x] Model antrenat de la ZERO (nu fine-tuning pe model pre-antrenat)
+- [x] Minimum 10 epoci rulate (verificabil în `results/training_history.csv`)
+- [x] Tabel hiperparametri + justificări completat în acest README
+- [x] Metrici calculate pe test set: **Accuracy ≥65%**, **F1 ≥0.60**
+- [x] Model salvat în `models/trained_model.h5` (sau .pt, .lvmodel)
+- [x] `results/training_history.csv` există cu toate epoch-urile
 
 ### Integrare UI și Demonstrație - Nivel 1 (OBLIGATORIU)
-- [ ] Model ANTRENAT încărcat în UI din Etapa 4 (nu model dummy)
-- [ ] UI face inferență REALĂ cu predicții corecte
-- [ ] Screenshot inferență reală în `docs/screenshots/inference_real.png`
-- [ ] Verificat: predicțiile sunt diferite față de Etapa 4 (când erau random)
+- [x] Model ANTRENAT încărcat în UI din Etapa 4 (nu model dummy)
+- [x] UI face inferență REALĂ cu predicții corecte
+- [x] Screenshot inferență reală în `docs/screenshots/inference_real.png`
+- [x] Verificat: predicțiile sunt diferite față de Etapa 4 (când erau random)
 
 ### Documentație Nivel 2 (dacă aplicabil)
-- [ ] Early stopping implementat și documentat în cod
-- [ ] Learning rate scheduler folosit (ReduceLROnPlateau / StepLR)
+- [x] Early stopping implementat și documentat în cod
+- [x] Learning rate scheduler folosit (ReduceLROnPlateau / StepLR)
 - [ ] Augmentări relevante domeniu aplicate (NU rotații simple!)
-- [ ] Grafic loss/val_loss salvat în `docs/loss_curve.png`
+- [x] Grafic loss/val_loss salvat în `docs/loss_curve.png`
 - [ ] Analiză erori în context industrial completată (4 întrebări răspunse)
-- [ ] Metrici Nivel 2: **Accuracy ≥75%**, **F1 ≥0.70**
+- [x] Metrici Nivel 2: **Accuracy ≥75%**, **F1 ≥0.70**
 
 ### Documentație Nivel 3 Bonus (dacă aplicabil)
 - [ ] Comparație 2+ arhitecturi (tabel comparativ + justificare)

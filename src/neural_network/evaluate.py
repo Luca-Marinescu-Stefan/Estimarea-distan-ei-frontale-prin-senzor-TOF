@@ -37,6 +37,15 @@ def load_model(model_path: Path) -> tuple[Any, str]:
     raise RuntimeError(f'Model not found or unsupported format: {model_path}')
 
 
+def _is_already_scaled(X: np.ndarray) -> bool:
+    if X.size == 0:
+        return False
+    mean_abs = float(np.abs(X.mean(axis=0)).mean())
+    std = X.std(axis=0)
+    std_mean = float(np.mean(std)) if std.size else 0.0
+    return mean_abs < 0.05 and 0.8 <= std_mean <= 1.2
+
+
 def load_test_data() -> tuple[pd.DataFrame, np.ndarray, np.ndarray]:
     test = pd.read_csv('data/test/X_test.csv')
     if 'label' not in test.columns:
@@ -94,6 +103,17 @@ def save_confusion_matrix(cm: np.ndarray, labels: list[int], out_path: Path) -> 
     plt.close(fig)
 
 
+def maybe_scale_for_keras(X: np.ndarray) -> np.ndarray:
+    if _is_already_scaled(X):
+        return X
+    scaler_path = Path('config/preprocessing_params.pkl')
+    if scaler_path.exists():
+        payload = joblib.load(scaler_path)
+        scaler = payload.get('scaler') if isinstance(payload, dict) else payload
+        return scaler.transform(X)
+    return X
+
+
 def main() -> None:
     args = parse_args()
     Path('results').mkdir(parents=True, exist_ok=True)
@@ -103,7 +123,11 @@ def main() -> None:
     test_df, X_test, y_test = load_test_data()
 
     start = time.perf_counter()
-    preds, confidence = compute_confidence(model_type, model, X_test)
+    X_for_model = X_test
+    if model_type == 'keras':
+        X_for_model = maybe_scale_for_keras(X_test)
+
+    preds, confidence = compute_confidence(model_type, model, X_for_model)
     latency_ms = (time.perf_counter() - start) * 1000.0
     latency_per_sample = latency_ms / max(len(X_test), 1)
 
