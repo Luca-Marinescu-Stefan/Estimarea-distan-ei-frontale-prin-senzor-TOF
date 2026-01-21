@@ -1,0 +1,5 @@
+Rulare completă (Git Bash) - o singură comandă:
+./.venv/Scripts/python.exe src/preprocessing/combine_datasets.py ; ./.venv/Scripts/python.exe src/preprocessing/data_cleaner.py ; ./.venv/Scripts/python.exe src/preprocessing/feature_engineering.py ; ./.venv/Scripts/python.exe src/preprocessing/process_data.py ; ./.venv/Scripts/python.exe src/preprocessing/data_splitter.py ; ./.venv/Scripts/python.exe src/neural_network/train.py --backend keras --epochs 50 --batch-size 32 --early-stopping --reduce-lr ; ./.venv/Scripts/python.exe src/neural_network/evaluate.py --model models/trained_model.h5
+
+UI (Streamlit):
+./.venv/Scripts/streamlit.exe run src/app/main.py
