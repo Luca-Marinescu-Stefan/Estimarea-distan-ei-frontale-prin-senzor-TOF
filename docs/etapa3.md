@@ -1,7 +1,7 @@
 # 📘 README – Etapa 3: Analiza și Pregătirea Setului de Date pentru Rețele Neuronale
 
 **Disciplina:** Rețele Neuronale  
-**Instituție:** POLITEHNICA București – FIIR  
+**Instituție:** POLITEHNICA București – FIIR  fa
 **Student:** [Nume Prenume]  
 **Data:** [Data]  
 
