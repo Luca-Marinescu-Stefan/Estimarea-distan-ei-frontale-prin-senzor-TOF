@@ -1,0 +1,6 @@
+experiment,n_estimators,max_depth,min_samples_split,min_samples_leaf,val_accuracy,val_f1_macro,train_time_sec
+baseline,200,,2,1,1.0,1.0,0.2553
+exp1_more_trees,400,,2,1,1.0,1.0,0.5069
+exp2_depth_10,300,10,2,1,1.0,1.0,0.3933
+exp3_min_leaf_2,300,12,2,2,1.0,1.0,0.3639
+exp4_split_4,250,14,4,1,1.0,1.0,0.3149

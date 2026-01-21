@@ -6,6 +6,8 @@ Justificare:
 - Am ales un flux de tip monitorizare în timp real: date sunt colectate, preprocesate, trecute prin RN și rezultatul afișat/înregistrat.
 - State ERROR gestionează pierderi de date, timeouts sau valori abnormally high.
 
+Diagrama SVG: `docs/state_machine.svg`
+
 Stări principale:
 1. IDLE: așteaptă trigger (start manual sau cron)
 2. ACQUIRE_DATA: citește batch de la `src/data_acquisition` sau din CSV

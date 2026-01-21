@@ -1,8 +1,18 @@
 {
   "scaler": "StandardScaler",
-  "features": ["distance_raw","signal_strength","temperature"],
-  "random_state": 42,
-  "train_ratio": 0.7,
-  "validation_ratio": 0.15,
-  "test_ratio": 0.15
+  "features": [
+    "distance_raw",
+    "signal_strength",
+    "temperature"
+  ],
+  "mean_": [
+    643.7843053677933,
+    120.610337972167,
+    27.291451292246517
+  ],
+  "scale_": [
+    524.7549327834582,
+    30.599994511445367,
+    4.335391844165711
+  ]
 }

@@ -1,0 +1,8 @@
+backend: keras
+epochs: 10
+batch_size: 32
+learning_rate: 0.001
+hidden_units: 64
+dropout: 0.0
+early_stopping: True
+reduce_lr: False

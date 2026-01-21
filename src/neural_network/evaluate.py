@@ -1,69 +1,151 @@
-"""Evaluate trained model on test set and save metrics."""
-import pandas as pd
+"""Evaluate trained model on test set and save metrics + optional analysis."""
+from __future__ import annotations
+
+import argparse
 import json
-from tensorflow.keras.models import load_model
-from sklearn.metrics import accuracy_score, f1_score
-import os
+import time
 from pathlib import Path
+from typing import Any
 
-model_path = Path('models/trained_model.h5')
-if not model_path.exists():
-    raise RuntimeError('Trained model not found at models/trained_model.h5. Run training first.')
-model = load_model(model_path)
-
-test = pd.read_csv('data/test/X_test.csv')
-FEATURES = ['distance_raw','signal_strength','temperature']
-X_test = test[FEATURES].fillna(0).values
-test['label'] = pd.to_numeric(test.get('label'), errors='coerce')
-test = test.dropna(subset=['label'])
-if len(test) == 0:
-    raise RuntimeError('No labeled test examples found in data/test/X_test.csv')
-y_test = test['label'].astype(int).values
-
-pred = model.predict(X_test)
-import json
-import pandas as pd
-from pathlib import Path
-from sklearn.metrics import accuracy_score
 import joblib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
+                             precision_score, recall_score)
 
-Path('results').mkdir(parents=True, exist_ok=True)
 
-# Prefer scikit-learn joblib model if present
-model_path_joblib = Path('models/trained_model.joblib')
-model_path_h5 = Path('models/trained_model.h5')
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Evaluate trained model')
+    parser.add_argument('--model', type=str, default='models/trained_model.joblib')
+    parser.add_argument('--detailed', action='store_true')
+    parser.add_argument('--out-metrics', type=str, default='results/test_metrics.json')
+    parser.add_argument('--confusion-path', type=str, default='docs/confusion_matrix_optimized.png')
+    parser.add_argument('--error-analysis-path', type=str, default='results/error_analysis.json')
+    return parser.parse_args()
 
-if model_path_joblib.exists():
-    model = joblib.load(model_path_joblib)
-    model_type = 'sklearn'
-elif model_path_h5.exists():
-    try:
-        from tensorflow.keras.models import load_model
-        model = load_model(str(model_path_h5))
-        model_type = 'keras'
-    except Exception as e:
-        raise RuntimeError(f'Failed to load Keras model: {e}')
-else:
-    raise RuntimeError('Trained model not found: models/trained_model.joblib or models/trained_model.h5')
 
-X_test = pd.read_csv('data/test/X_test.csv')
-if 'label' not in X_test.columns:
-    raise RuntimeError('Missing label column in data/test/X_test.csv')
+def load_model(model_path: Path) -> tuple[Any, str]:
+    if model_path.suffix == '.joblib' and model_path.exists():
+        return joblib.load(model_path), 'sklearn'
+    if model_path.suffix == '.h5' and model_path.exists():
+        try:
+            from tensorflow.keras.models import load_model
+        except Exception:
+            from keras.models import load_model
+        return load_model(str(model_path)), 'keras'
+    raise RuntimeError(f'Model not found or unsupported format: {model_path}')
 
-X_test = X_test.dropna(subset=['label']).copy()
-y_test = X_test['label'].astype(int).values
-FEATURES = ['distance_raw','signal_strength','temperature']
-X = X_test[FEATURES].fillna(0).values
 
-if model_type == 'sklearn':
-    preds = model.predict(X)
-    acc = float(accuracy_score(y_test, preds))
-    metrics = {'accuracy': acc}
-else:
-    loss, acc = model.evaluate(X, y_test, verbose=0)
-    metrics = {'loss': float(loss), 'accuracy': float(acc)}
+def load_test_data() -> tuple[pd.DataFrame, np.ndarray, np.ndarray]:
+    test = pd.read_csv('data/test/X_test.csv')
+    if 'label' not in test.columns:
+        raise RuntimeError('Missing label column in data/test/X_test.csv')
+    test = test.dropna(subset=['label']).copy()
+    if len(test) == 0:
+        raise RuntimeError('No labeled test examples found in data/test/X_test.csv')
+    test['label'] = pd.to_numeric(test['label'], errors='coerce')
+    test = test.dropna(subset=['label'])
+    features = ['distance_raw', 'signal_strength', 'temperature']
+    X = test[features].fillna(0).values
+    y = test['label'].astype(int).values
+    return test, X, y
 
-with open('results/test_metrics.json','w') as f:
-    json.dump(metrics, f, indent=2)
 
-print('Evaluation complete. Results written to results/test_metrics.json')
+def compute_confidence(model_type: str, model: Any, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    if model_type == 'sklearn':
+        if hasattr(model, 'predict_proba'):
+            proba = model.predict_proba(X)
+            preds = np.argmax(proba, axis=1)
+            confidence = proba.max(axis=1)
+        else:
+            preds = model.predict(X)
+            confidence = np.full(shape=(len(preds),), fill_value=np.nan)
+    else:
+        proba = model.predict(X, verbose=0)
+        preds = np.argmax(proba, axis=1)
+        confidence = proba.max(axis=1)
+    return preds, confidence
+
+
+def save_confusion_matrix(cm: np.ndarray, labels: list[int], out_path: Path) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, ax = plt.subplots(figsize=(6, 5))
+    im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    ax.figure.colorbar(im, ax=ax)
+    ax.set(
+        xticks=np.arange(len(labels)),
+        yticks=np.arange(len(labels)),
+        xticklabels=labels,
+        yticklabels=labels,
+        ylabel='True label',
+        xlabel='Predicted label',
+        title='Confusion Matrix (Optimized)'
+    )
+    plt.setp(ax.get_xticklabels(), rotation=45, ha='right', rotation_mode='anchor')
+    thresh = cm.max() / 2.0 if cm.max() > 0 else 0.5
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], 'd'),
+                    ha='center', va='center',
+                    color='white' if cm[i, j] > thresh else 'black')
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+
+
+def main() -> None:
+    args = parse_args()
+    Path('results').mkdir(parents=True, exist_ok=True)
+
+    model_path = Path(args.model)
+    model, model_type = load_model(model_path)
+    test_df, X_test, y_test = load_test_data()
+
+    start = time.perf_counter()
+    preds, confidence = compute_confidence(model_type, model, X_test)
+    latency_ms = (time.perf_counter() - start) * 1000.0
+    latency_per_sample = latency_ms / max(len(X_test), 1)
+
+    metrics = {
+        'model': str(model_path),
+        'test_accuracy': float(accuracy_score(y_test, preds)),
+        'test_f1_macro': float(f1_score(y_test, preds, average='macro')),
+        'test_precision_macro': float(precision_score(y_test, preds, average='macro', zero_division=0)),
+        'test_recall_macro': float(recall_score(y_test, preds, average='macro', zero_division=0)),
+        'false_negative_rate': None,
+        'false_positive_rate': None,
+        'inference_latency_ms_total': round(latency_ms, 4),
+        'inference_latency_ms_per_sample': round(latency_per_sample, 6),
+    }
+
+    labels = sorted(pd.unique(pd.Series(y_test)))
+    cm = confusion_matrix(y_test, preds, labels=labels)
+    if cm.size > 0:
+        if len(labels) == 2:
+            tn, fp, fn, tp = cm.ravel()
+            metrics['false_negative_rate'] = float(fn / max(fn + tp, 1))
+            metrics['false_positive_rate'] = float(fp / max(fp + tn, 1))
+
+    with open(args.out_metrics, 'w', encoding='utf-8') as f:
+        json.dump(metrics, f, indent=2)
+
+    if args.detailed:
+        save_confusion_matrix(cm, labels, Path(args.confusion_path))
+
+        # Error analysis: top 5 misclassified by confidence
+        test_df = test_df.reset_index(drop=False).rename(columns={'index': 'row_index'})
+        error_mask = preds != y_test
+        error_df = test_df.loc[error_mask].copy()
+        error_df['predicted'] = preds[error_mask]
+        error_df['confidence'] = confidence[error_mask]
+        error_df = error_df.sort_values(by='confidence', ascending=False).head(5)
+        errors = error_df[['row_index', 'label', 'predicted', 'confidence']].to_dict(orient='records')
+        with open(args.error_analysis_path, 'w', encoding='utf-8') as f:
+            json.dump({'top_errors': errors}, f, indent=2)
+
+    print(f"Evaluation complete. Metrics written to {args.out_metrics}")
+
+
+if __name__ == '__main__':
+    main()

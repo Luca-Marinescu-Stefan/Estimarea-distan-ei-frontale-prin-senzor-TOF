@@ -55,6 +55,7 @@ project-name/
 - Analiză și pregătire (Etapa 3): [docs/etapa3.md](docs/etapa3.md)
 - Arhitectura aplicației (Etapa 4): [README_Etapa4_Arhitectura_SIA.md](README_Etapa4_Arhitectura_SIA.md)
 - Antrenare model (Etapa 5): [README_Etapa5_Antrenare_RN.md](README_Etapa5_Antrenare_RN.md)
+- Optimizare și concluzii (Etapa 6): [etapa6_optimizare_concluzii.md](etapa6_optimizare_concluzii.md)
 - Schelet proiect: am adăugat scripturi de generare, preprocesare, model, training/eval și UI stub. Vezi `src/` și `data/`.
 
 ---

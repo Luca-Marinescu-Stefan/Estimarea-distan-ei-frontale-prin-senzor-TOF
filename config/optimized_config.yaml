@@ -1,0 +1,8 @@
+model_type: RandomForestClassifier
+features: ['distance_raw', 'signal_strength', 'temperature']
+n_estimators: 200
+max_depth: None
+min_samples_split: 2
+min_samples_leaf: 1
+threshold_alert: 0.35
+confidence_min: 0.60

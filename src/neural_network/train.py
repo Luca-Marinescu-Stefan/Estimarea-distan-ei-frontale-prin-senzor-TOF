@@ -1,66 +1,224 @@
-"""Train script (demo) using scikit-learn (RandomForest). Expects CSVs from data_splitter.py"""
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-import joblib
+"""Train script for sklearn (RandomForest) or Keras MLP. Expects CSVs from data_splitter.py"""
+from __future__ import annotations
+
+import argparse
 import csv
+import json
+import time
+from pathlib import Path
 
-outdir = Path('models')
-outdir.mkdir(parents=True, exist_ok=True)
+import joblib
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, f1_score
+from sklearn.preprocessing import StandardScaler
 
-# ensure results dir exists
-Path('results').mkdir(parents=True, exist_ok=True)
 
-train = pd.read_csv('data/train/X_train.csv')
-val = pd.read_csv('data/validation/X_val.csv')
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Train model (sklearn or Keras)')
+    parser.add_argument('--backend', type=str, choices=['sklearn', 'keras'], default='sklearn')
 
-# features: distance_raw,signal_strength,temperature -> simple selection
-FEATURES = ['distance_raw','signal_strength','temperature']
+    # sklearn params
+    parser.add_argument('--n-estimators', type=int, default=200)
+    parser.add_argument('--max-depth', type=int, default=None)
+    parser.add_argument('--min-samples-split', type=int, default=2)
+    parser.add_argument('--min-samples-leaf', type=int, default=1)
+    parser.add_argument('--random-state', type=int, default=42)
 
-# Validate label column
-for df_name, df in [('train', train), ('val', val)]:
-    if 'label' not in df.columns:
-        raise RuntimeError(f"Missing 'label' column in data/{df_name}/X_{'train' if df_name=='train' else 'val'}.csv")
+    # keras params
+    parser.add_argument('--epochs', type=int, default=50)
+    parser.add_argument('--batch-size', type=int, default=32)
+    parser.add_argument('--learning-rate', type=float, default=0.001)
+    parser.add_argument('--hidden-units', type=int, default=64)
+    parser.add_argument('--dropout', type=float, default=0.0)
+    parser.add_argument('--early-stopping', action='store_true')
+    parser.add_argument('--reduce-lr', action='store_true')
 
-train = train.copy()
-val = val.copy()
-train['label'] = pd.to_numeric(train['label'], errors='coerce')
-val['label'] = pd.to_numeric(val['label'], errors='coerce')
+    parser.add_argument('--model-out', type=str, default='')
+    parser.add_argument('--history-out', type=str, default='results/training_history.csv')
+    parser.add_argument('--name', type=str, default='baseline')
+    return parser.parse_args()
 
-# Drop rows with NaN labels
-before_train = len(train)
-before_val = len(val)
-train = train.dropna(subset=['label'])
-val = val.dropna(subset=['label'])
-after_train = len(train)
-after_val = len(val)
-print(f"Dropped {before_train-after_train} rows with NaN label from train, {before_val-after_val} from val")
 
-if len(train) == 0 or len(val) == 0:
-    raise RuntimeError('Empty train or validation set after dropping rows with missing labels')
+def load_datasets() -> tuple[pd.DataFrame, pd.DataFrame]:
+    train = pd.read_csv('data/train/X_train.csv')
+    val = pd.read_csv('data/validation/X_val.csv')
+    for df_name, df in [('train', train), ('val', val)]:
+        if 'label' not in df.columns:
+            raise RuntimeError(
+                f"Missing 'label' column in data/{df_name}/X_{'train' if df_name == 'train' else 'val'}.csv"
+            )
+    train = train.copy()
+    val = val.copy()
+    train['label'] = pd.to_numeric(train['label'], errors='coerce')
+    val['label'] = pd.to_numeric(val['label'], errors='coerce')
+    train = train.dropna(subset=['label'])
+    val = val.dropna(subset=['label'])
+    if len(train) == 0 or len(val) == 0:
+        raise RuntimeError('Empty train or validation set after dropping rows with missing labels')
+    return train, val
 
-X_train = train[FEATURES].fillna(0).values
-y_train = train['label'].astype(int).values
-X_val = val[FEATURES].fillna(0).values
-y_val = val['label'].astype(int).values
 
-# Train a RandomForest classifier (fast and reliable for demo)
-clf = RandomForestClassifier(n_estimators=100, random_state=42)
-clf.fit(X_train, y_train)
+def save_hyperparams(path: Path, params: dict) -> None:
+    lines = [f"{k}: {v}" for k, v in params.items()]
+    path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
-# Validate
-val_pred = clf.predict(X_val)
-val_acc = float(accuracy_score(y_val, val_pred))
 
-# Save model
-joblib.dump(clf, outdir / 'trained_model.joblib')
+def prepare_features(train: pd.DataFrame, val: pd.DataFrame, features: list[str]) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    scaler_path = Path('config/preprocessing_params.pkl')
+    if scaler_path.exists():
+        payload = joblib.load(scaler_path)
+        scaler = payload.get('scaler') if isinstance(payload, dict) else payload
+    else:
+        scaler = StandardScaler()
+        scaler.fit(train[features].fillna(0).values)
+        scaler_path.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump({'scaler': scaler, 'features': features}, scaler_path)
+        Path('config/preprocessing_params.json').write_text(
+            json.dumps({'scaler': 'StandardScaler', 'features': features}, indent=2),
+            encoding='utf-8'
+        )
 
-# Save a small training summary
-with open('results/training_history.csv','w',newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow(['val_accuracy'])
-    writer.writerow([val_acc])
+    X_train = scaler.transform(train[features].fillna(0).values)
+    X_val = scaler.transform(val[features].fillna(0).values)
+    y_train = train['label'].astype(int).values
+    y_val = val['label'].astype(int).values
+    return X_train, y_train, X_val, y_val
 
-print(f'Training finished. Model saved to {outdir/"trained_model.joblib"}. Validation accuracy: {val_acc:.4f}')
+
+def main() -> None:
+    args = parse_args()
+    Path('models').mkdir(parents=True, exist_ok=True)
+    Path('results').mkdir(parents=True, exist_ok=True)
+
+    train, val = load_datasets()
+    features = ['distance_raw', 'signal_strength', 'temperature']
+
+    X_train, y_train, X_val, y_val = prepare_features(train, val, features)
+
+    if args.backend == 'keras':
+        try:
+            from tensorflow import keras
+            from tensorflow.keras import layers
+        except Exception:
+            import keras
+            from keras import layers
+
+        num_classes = len(np.unique(y_train))
+        inputs = keras.Input(shape=(X_train.shape[1],))
+        x = layers.Dense(args.hidden_units, activation='relu')(inputs)
+        if args.dropout > 0:
+            x = layers.Dropout(args.dropout)(x)
+        x = layers.Dense(args.hidden_units, activation='relu')(x)
+        outputs = layers.Dense(num_classes, activation='softmax')(x)
+        model = keras.Model(inputs, outputs)
+        model.compile(
+            optimizer=keras.optimizers.Adam(learning_rate=args.learning_rate),
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy'],
+        )
+
+        callbacks = []
+        if args.early_stopping:
+            callbacks.append(keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True))
+        if args.reduce_lr:
+            callbacks.append(keras.callbacks.ReduceLROnPlateau(patience=3, factor=0.5))
+
+        history = model.fit(
+            X_train,
+            y_train,
+            validation_data=(X_val, y_val),
+            epochs=args.epochs,
+            batch_size=args.batch_size,
+            callbacks=callbacks,
+            verbose=1,
+        )
+
+        val_pred = np.argmax(model.predict(X_val, verbose=0), axis=1)
+        val_acc = float(accuracy_score(y_val, val_pred))
+        val_f1 = float(f1_score(y_val, val_pred, average='macro'))
+
+        model_out = Path(args.model_out or 'models/trained_model.h5')
+        model.save(model_out)
+
+        history_out = Path(args.history_out)
+        history_out.parent.mkdir(parents=True, exist_ok=True)
+        hist = history.history
+        with open(history_out, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(['epoch', 'loss', 'accuracy', 'val_loss', 'val_accuracy'])
+            for i in range(len(hist.get('loss', []))):
+                writer.writerow([
+                    i + 1,
+                    hist['loss'][i],
+                    hist.get('accuracy', [None])[i],
+                    hist.get('val_loss', [None])[i],
+                    hist.get('val_accuracy', [None])[i],
+                ])
+
+        hyperparams = {
+            'backend': 'keras',
+            'epochs': args.epochs,
+            'batch_size': args.batch_size,
+            'learning_rate': args.learning_rate,
+            'hidden_units': args.hidden_units,
+            'dropout': args.dropout,
+            'early_stopping': args.early_stopping,
+            'reduce_lr': args.reduce_lr,
+        }
+        save_hyperparams(Path('results/hyperparameters.yaml'), hyperparams)
+
+        print(
+            f"Training finished. Model saved to {model_out}. Validation accuracy: {val_acc:.4f}, "
+            f"F1-macro: {val_f1:.4f}"
+        )
+        return
+
+    # sklearn backend (default)
+    clf = RandomForestClassifier(
+        n_estimators=args.n_estimators,
+        max_depth=args.max_depth,
+        min_samples_split=args.min_samples_split,
+        min_samples_leaf=args.min_samples_leaf,
+        random_state=args.random_state,
+        n_jobs=-1,
+    )
+
+    start = time.perf_counter()
+    clf.fit(X_train, y_train)
+    train_time = time.perf_counter() - start
+
+    val_pred = clf.predict(X_val)
+    val_acc = float(accuracy_score(y_val, val_pred))
+    val_f1 = float(f1_score(y_val, val_pred, average='macro'))
+
+    model_out = Path(args.model_out or 'models/trained_model.joblib')
+    model_out.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(clf, model_out)
+
+    history_out = Path(args.history_out)
+    history_out.parent.mkdir(parents=True, exist_ok=True)
+    with open(history_out, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['experiment', 'val_accuracy', 'val_f1_macro', 'train_time_sec'])
+        writer.writerow([args.name, val_acc, val_f1, round(train_time, 4)])
+
+    hyperparams = {
+        'backend': 'sklearn',
+        'n_estimators': args.n_estimators,
+        'max_depth': args.max_depth,
+        'min_samples_split': args.min_samples_split,
+        'min_samples_leaf': args.min_samples_leaf,
+        'random_state': args.random_state,
+    }
+    save_hyperparams(Path('results/hyperparameters.yaml'), hyperparams)
+
+    print(
+        f"Training finished. Model saved to {model_out}. Validation accuracy: {val_acc:.4f}, "
+        f"F1-macro: {val_f1:.4f}"
+    )
+
+
+if __name__ == '__main__':
+    main()

@@ -1,35 +1,71 @@
-"""Simple Streamlit UI to upload a CSV row and run inference with trained model."""
-import streamlit as st
-import pandas as pd
-from tensorflow.keras.models import load_model
+"""Simple Streamlit UI to upload a CSV row and run inference with optimized model."""
+from __future__ import annotations
 
-st.title('SIA - Demo Inference')
+import joblib
+import numpy as np
+import pandas as pd
+import streamlit as st
+from pathlib import Path
+
+st.title('SIA - Demo Inference (Optimized)')
 
 uploaded = st.file_uploader('Upload CSV with columns: distance_raw,signal_strength,temperature', type=['csv'])
+
+def load_any_model():
+    if Path('models/optimized_model.joblib').exists():
+        return joblib.load('models/optimized_model.joblib'), 'sklearn', 'optimized_model.joblib'
+    if Path('models/trained_model.joblib').exists():
+        return joblib.load('models/trained_model.joblib'), 'sklearn', 'trained_model.joblib'
+    if Path('models/optimized_model.h5').exists():
+        from tensorflow.keras.models import load_model
+        return load_model('models/optimized_model.h5'), 'keras', 'optimized_model.h5'
+    if Path('models/trained_model.h5').exists():
+        from tensorflow.keras.models import load_model
+        return load_model('models/trained_model.h5'), 'keras', 'trained_model.h5'
+    raise RuntimeError('No model available. Run training/optimization first.')
+
+
+def predict_with_confidence(model, model_type: str, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    if model_type == 'sklearn':
+        if hasattr(model, 'predict_proba'):
+            proba = model.predict_proba(X)
+            return np.argmax(proba, axis=1), proba.max(axis=1)
+        preds = model.predict(X)
+        return preds, np.full(shape=(len(preds),), fill_value=np.nan)
+    proba = model.predict(X, verbose=0)
+    return np.argmax(proba, axis=1), proba.max(axis=1)
+
 
 if uploaded is not None:
     df = pd.read_csv(uploaded)
     st.write('Preview')
     st.write(df.head())
-    try:
-        model = load_model('models/trained_model.h5')
-        st.success('Loaded trained_model.h5')
-    except Exception as e:
-        st.warning('Could not load trained model, loading untrained_model.h5 if available')
-        try:
-            model = load_model('models/untrained_model.h5')
-        except Exception:
-            st.error('No model available. Run training first.')
-            st.stop()
 
-    FEATURES = ['distance_raw','signal_strength','temperature']
-    X = df[FEATURES].fillna(0).values
-    preds = model.predict(X)
-    import numpy as np
-    classes = np.argmax(preds, axis=1)
-    df['pred_class'] = classes
-    df['confidence'] = preds.max(axis=1)
+    try:
+        model, model_type, model_name = load_any_model()
+        st.success(f'Loaded {model_name}')
+    except Exception as e:
+        st.error(str(e))
+        st.stop()
+
+    features = ['distance_raw', 'signal_strength', 'temperature']
+    X = df[features].fillna(0).values
+    preds, conf = predict_with_confidence(model, model_type, X)
+    df['pred_class'] = preds
+    df['confidence'] = conf
+
+    # Simple decision logic (State Machine-like)
+    threshold = 0.35
+    confidence_min = 0.60
+    alert_mask = (df['pred_class'] >= 1) & (df['confidence'] >= threshold)
+    df['decision'] = np.where(
+        df['confidence'] < confidence_min,
+        'CONFIDENCE_CHECK',
+        np.where(alert_mask, 'ALERT', 'NORMAL')
+    )
+
     st.write(df)
-    st.markdown('Save screenshot to docs/screenshots/inference_real.png')
+    st.progress(float(np.nanmean(df['confidence'])) if len(df) else 0.0, text='Confidence (avg)')
+    st.markdown('Save screenshot to docs/screenshots/inference_optimized.png')
 else:
     st.info('Upload a CSV to run inference')

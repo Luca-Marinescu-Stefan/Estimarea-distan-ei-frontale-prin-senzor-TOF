@@ -1,3 +1,11 @@
 {
-  "accuracy": 1.0
+  "model": "C:\\Users\\marin\\Estimarea-distan-ei-frontale-prin-senzor-TOF\\models\\trained_model.h5",
+  "test_accuracy": 0.2236842105263158,
+  "test_f1_macro": 0.22549257759784075,
+  "test_precision_macro": 0.3279120879120879,
+  "test_recall_macro": 0.22634920634920636,
+  "false_negative_rate": null,
+  "false_positive_rate": null,
+  "inference_latency_ms_total": 123.9875,
+  "inference_latency_ms_per_sample": 1.631414
 }

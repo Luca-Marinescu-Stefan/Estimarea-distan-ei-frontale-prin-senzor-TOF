@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="200">
+  <style>
+    .box { fill: #f5f7ff; stroke: #4c78a8; stroke-width: 2; }
+    .text { font-family: Arial, sans-serif; font-size: 12px; fill: #1f2937; }
+    .arrow { stroke: #4c78a8; stroke-width: 2; marker-end: url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4c78a8" />
+    </marker>
+  </defs>
+
+  <rect class="box" x="20" y="60" width="90" height="40" rx="6" />
+  <text class="text" x="65" y="85" text-anchor="middle">IDLE</text>
+
+  <rect class="box" x="140" y="60" width="120" height="40" rx="6" />
+  <text class="text" x="200" y="85" text-anchor="middle">ACQUIRE</text>
+
+  <rect class="box" x="290" y="60" width="120" height="40" rx="6" />
+  <text class="text" x="350" y="85" text-anchor="middle">PREPROCESS</text>
+
+  <rect class="box" x="440" y="60" width="120" height="40" rx="6" />
+  <text class="text" x="500" y="85" text-anchor="middle">INFERENCE</text>
+
+  <rect class="box" x="590" y="60" width="120" height="40" rx="6" />
+  <text class="text" x="650" y="85" text-anchor="middle">DISPLAY</text>
+
+  <rect class="box" x="740" y="60" width="120" height="40" rx="6" />
+  <text class="text" x="800" y="85" text-anchor="middle">LOG</text>
+
+  <line class="arrow" x1="110" y1="80" x2="140" y2="80" />
+  <line class="arrow" x1="260" y1="80" x2="290" y2="80" />
+  <line class="arrow" x1="410" y1="80" x2="440" y2="80" />
+  <line class="arrow" x1="560" y1="80" x2="590" y2="80" />
+  <line class="arrow" x1="710" y1="80" x2="740" y2="80" />
+
+  <rect class="box" x="380" y="140" width="120" height="40" rx="6" />
+  <text class="text" x="440" y="165" text-anchor="middle">ERROR</text>
+  <line class="arrow" x1="500" y1="100" x2="440" y2="140" />
+</svg>
