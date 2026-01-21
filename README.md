@@ -59,3 +59,14 @@ project-name/
 
 ---
 
+## Asistență GPT/Codex în Visual Studio (opțional)
+
+Nu există o extensie oficială numită **"GPT 5.2 Codex"** pentru Visual Studio. Pentru funcționalități similare (completare cod, chat AI), folosește **GitHub Copilot**:
+
+1. Deschide **Visual Studio** → **Extensions** → **Manage Extensions**.
+2. Caută și instalează **GitHub Copilot** (și **GitHub Copilot Chat**, dacă este disponibil).
+3. Repornește Visual Studio după instalare.
+4. Autentifică-te cu un cont GitHub care are activ un abonament Copilot.
+5. Deschide panoul **Copilot Chat** din **View** → **Other Windows**.
+
+Dacă vrei să folosești un model OpenAI prin API, ai nevoie de o extensie terță parte care acceptă chei OpenAI și de o cheie API activă.
