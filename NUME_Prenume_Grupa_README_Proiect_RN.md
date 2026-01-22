@@ -270,7 +270,7 @@ Rezultatele indică o corecție foarte bună pentru setul de test, ceea ce suger
 | 3 | Decizie | `NORMAL` / `ALERT` / `CONFIDENCE_CHECK` |
 
 **Latență măsurată end-to-end:** ~0.35 ms/sample (inferență)
-**Data și ora demonstrației:** 22.01.2026, 12:00
+**Data și ora demonstrației:** N/A (demo end-to-end neînregistrat)
 
 ---
 
@@ -426,7 +426,7 @@ Aș extinde colectarea de date reale pentru a valida modelul în condiții indus
 
 ### Repository și Documentație
 
-- [x] **README.md** complet
+- [ ] **README.md** complet
 - [x] **README-uri etape** prezente
 - [x] **Screenshots** prezente în `docs/screenshots/`
 - [x] **Structura repository** conformă
@@ -437,9 +437,9 @@ Aș extinde colectarea de date reale pentru a valida modelul în condiții indus
 ### Acces și Versionare
 
 - [x] **Repository accesibil** cadrelor didactice RN (public)
-- [ ] **Tag `v0.6-optimized-final`** creat și pushed
-- [ ] **Commit-uri incrementale** vizibile
-- [ ] **Fișiere mari** (>100MB) excluse sau în `.gitignore`
+- [x] **Tag `v0.6-optimized-final`** creat și pushed
+- [x] **Commit-uri incrementale** vizibile
+- [x] **Fișiere mari** (>100MB) excluse sau în `.gitignore`
 
 ### Verificare Anti-Plagiat
 
