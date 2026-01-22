@@ -422,7 +422,7 @@ Aș extinde colectarea de date reale pentru a valida modelul în condiții indus
 - [x] **Confusion matrix** generată
 - [x] **State Machine** definit (minim 4-6 stări)
 - [x] **Cele 3 module funcționale:** Data Logging, RN, UI
-- [ ] **Demonstrație end-to-end** disponibilă în `docs/demo/`
+- [x] **Demonstrație end-to-end** disponibilă în `docs/demo/`
 
 ### Repository și Documentație
 
