@@ -1,6 +1,21 @@
 """Split combined data into train/validation/test and save CSVs.
 Usage: python src/preprocessing/data_splitter.py
 """
+# -----------------------------------------------------------------------------
+# Modul: src/preprocessing/data_splitter.py
+# Scop: împarte datele în train/validation/test cu fallback robust.
+# Input: data/processed/combined.csv.
+# Output: data/train/X_train.csv, data/validation/X_val.csv, data/test/X_test.csv.
+# Utilizare: python src/preprocessing/data_splitter.py
+# Pași principali:
+#   1) Binning pe distance_ref pentru etichete.
+#   2) Split stratificat dacă e posibil.
+#   3) Fallback determinist pentru seturi mici.
+# Dependențe: pandas, scikit-learn.
+# Parametri implicați: bins, labels, random_state.
+# Fișiere scrise: folderele train/validation/test.
+# Observații: asigură split valid chiar și cu puține date.
+# -----------------------------------------------------------------------------
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from pathlib import Path

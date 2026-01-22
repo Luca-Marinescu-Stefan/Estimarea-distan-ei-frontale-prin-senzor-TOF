@@ -1,4 +1,25 @@
 """Simple Streamlit UI to upload a CSV row and run inference with optimized model."""
+# -----------------------------------------------------------------------------
+# Modul: src/app/main.py
+# Scop: UI Streamlit pentru inferență rapidă pe CSV.
+# Input: fișier CSV cu distance_raw, signal_strength, temperature.
+# Output: predicții, confidence și decizie (NORMAL/ALERT/CONFIDENCE_CHECK).
+# Utilizare: python -m streamlit run src/app/main.py
+# Pași principali:
+#   1) Încărcare model (optimized/trained).
+#   2) Încărcare date și preprocesare minimă.
+#   3) Predicție + scor de încredere.
+# Dependențe: streamlit, pandas, numpy, joblib.
+# Parametri implicați: threshold=0.35, confidence_min=0.60.
+# Fișiere citite: models/*.joblib sau models/*.h5.
+# Fișiere scrise: nu scrie; doar afișează în UI.
+# Observații: potrivit pentru demo și capturi de ecran.
+# Checklist UI:
+# - CSV cu 3 coloane obligatorii.
+# - Model disponibil în models/.
+# - Verifică bara de confidence.
+# - Salvează screenshot pentru raport.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 import joblib

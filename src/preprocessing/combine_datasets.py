@@ -1,4 +1,19 @@
 """Combine raw CSVs (data/raw and data/generated) into data/processed/combined.csv"""
+# -----------------------------------------------------------------------------
+# Modul: src/preprocessing/combine_datasets.py
+# Scop: combină toate CSV-urile raw + generated într-un singur fișier.
+# Input: data/raw/*.csv și data/generated/*.csv.
+# Output: data/processed/combined.csv.
+# Utilizare: python src/preprocessing/combine_datasets.py
+# Pași principali:
+#   1) Încărcare și normalizare nume coloane.
+#   2) Mapare RO→EN pentru feature-uri.
+#   3) Curățare distance_ref și filtrare rânduri invalide.
+# Dependențe: pandas, glob, regex.
+# Parametri implicați: col_map, bins de curățare.
+# Fișiere scrise: data/processed/combined.csv.
+# Observații: elimină duplicate de coloane și rânduri fără distance_ref.
+# -----------------------------------------------------------------------------
 import glob
 import pandas as pd
 from pathlib import Path

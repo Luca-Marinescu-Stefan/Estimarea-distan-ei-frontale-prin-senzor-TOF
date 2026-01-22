@@ -1,4 +1,19 @@
 """Run hyperparameter experiments and save optimized model + reports."""
+# -----------------------------------------------------------------------------
+# Modul: src/neural_network/optimize.py
+# Scop: rulare experimente de optimizare și salvare model final.
+# Input: data/train/X_train.csv, data/validation/X_val.csv, data/test/X_test.csv.
+# Output: models/optimized_model.joblib + results/final_metrics.json.
+# Utilizare: python src/neural_network/optimize.py
+# Pași principali:
+#   1) Rulează experimente cu parametri diferiți.
+#   2) Selectează cel mai bun model după F1.
+#   3) Evaluează pe test și salvează raport complet.
+# Dependențe: scikit-learn, pandas, numpy, matplotlib.
+# Parametri implicați: n_estimators, max_depth, min_samples_*.
+# Fișiere scrise: results/optimization_experiments.csv, config/optimized_config.yaml.
+# Observații: generează și confusion matrix + error_analysis.json.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 import csv

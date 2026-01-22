@@ -1,4 +1,19 @@
 """Evaluate trained model on test set and save metrics + optional analysis."""
+# -----------------------------------------------------------------------------
+# Modul: src/neural_network/evaluate.py
+# Scop: evaluare model pe setul de test și salvare metrici.
+# Input: data/test/X_test.csv și un model (joblib/h5).
+# Output: results/test_metrics.json + opțional confusion matrix/erori.
+# Utilizare: python src/neural_network/evaluate.py --model models/*.joblib|.h5
+# Pași principali:
+#   1) Încărcare model și date.
+#   2) Predicții + scoruri de încredere.
+#   3) Salvare metrici și diagrame.
+# Dependențe: numpy, pandas, scikit-learn, matplotlib.
+# Parametri implicați: --detailed, --out-metrics, --confusion-path.
+# Fișiere scrise: results/test_metrics.json, docs/confusion_matrix_optimized.png.
+# Observații: ajustează scaling pentru Keras dacă există scaler salvat.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 import argparse

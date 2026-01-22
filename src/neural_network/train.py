@@ -1,4 +1,19 @@
 """Train script for sklearn (RandomForest) or Keras MLP. Expects CSVs from data_splitter.py"""
+# -----------------------------------------------------------------------------
+# Modul: src/neural_network/train.py
+# Scop: antrenare model (sklearn sau Keras MLP) pe train/val.
+# Input: data/train/X_train.csv și data/validation/X_val.csv.
+# Output: model antrenat + fișiere de metrici/istoric.
+# Utilizare: python src/neural_network/train.py --backend sklearn|keras
+# Pași principali:
+#   1) Încărcare și validare seturi.
+#   2) Standardizare (dacă e necesar).
+#   3) Antrenare + evaluare pe setul de validare.
+# Dependențe: scikit-learn, tensorflow/keras (opțional).
+# Parametri implicați: n_estimators, epochs, batch_size etc.
+# Fișiere scrise: models/*, results/training_history.csv, results/hyperparameters.yaml.
+# Observații: salvează scaleri în config/ dacă nu există.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 import argparse

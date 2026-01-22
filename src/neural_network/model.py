@@ -1,4 +1,19 @@
 """Simple Keras model for demonstration (MLP)."""
+# -----------------------------------------------------------------------------
+# Modul: src/neural_network/model.py
+# Scop: definește un MLP simplu pentru date tabulare.
+# Input: input_dim, num_classes.
+# Output: model Keras compilat + posibilitate de salvare.
+# Utilizare: import build_model(...) sau rulare directă.
+# Pași principali:
+#   1) Construire arhitectură MLP.
+#   2) Compilare cu Adam + loss classification.
+#   3) Salvare model neantrenat (opțional).
+# Dependențe: tensorflow.keras.
+# Parametri implicați: input_dim, num_classes.
+# Fișiere scrise: models/untrained_model.h5 (doar în __main__).
+# Observații: folosit ca schelet pentru etapa 4.
+# -----------------------------------------------------------------------------
 from tensorflow import keras
 from tensorflow.keras import layers
 

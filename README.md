@@ -1,62 +1,44 @@
-# 📘 README – Etapa 3: Analiza și Pregătirea Setului de Date pentru Rețele Neuronale
+
+---
+
+# 📘 README – Proiect Final RN (SIA ToF)
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
-**Student:** Marinescu Luca-Stefan  
-**Data:** 27/11/2025
+**Student:** Marinescu Luca-Stefan (634AB)  
+**Data:** 22/01/2026
 
----
+## Rezumat
+Proiectul implementează un sistem inteligent pentru estimarea distanței frontale cu senzor Time‑of‑Flight (VL53L0X), folosind preprocesare + model ML pentru corecția erorilor neliniare și stabilizarea măsurătorilor.
 
-## Introducere
+## Stack Tehnologic
+- Python: pandas, numpy, scikit‑learn, TensorFlow/Keras, Streamlit, matplotlib
 
-Acest proiect implementează un sistem inteligent de măsurare a distanței (SIA) care combină un senzor Time-of-Flight (VL53L0X) cu o rețea neuronală artificială. Scopul este corectarea erorilor neliniare și reducerea zgomotului de măsurare, în special pe suprafețe reflectorizante și în condiții variabile de lumină.
+## Rulare rapidă
+1. Instalează dependențe: `pip install -r requirements.txt`
+2. Rulează UI: `python -m streamlit run src/app/main.py`
 
-### Obiective
+## Pipeline complet (PowerShell / VS Code)
+`python src/preprocessing/combine_datasets.py ; python src/preprocessing/data_cleaner.py ; python src/preprocessing/feature_engineering.py ; python src/preprocessing/process_data.py ; python src/preprocessing/data_splitter.py ; python src/neural_network/train.py --backend keras --epochs 50 --batch-size 32 --early-stopping --reduce-lr ; python src/neural_network/evaluate.py --model models/trained_model.h5`
 
-* Achiziția datelor brute (distanță, intensitate semnal, temperatură).
-* Creșterea preciziei măsurătorilor cu 15–25%.
-* Reducerea zgomotului de măsurare cu aprox. 40%.
+## Rezultate (test set)
+- Accuracy: 100.00%
+- F1‑macro: 1.00
+- Latență inferență: ~0.349 ms/sample
 
-## Arhitectura Sistemului
+## Structură proiect (scurt)
+- [src/](src/) – preprocesare, model, UI
+- [data/](data/) – raw/processed/train/val/test
+- [results/](results/) – metrici și experimente
+- [docs/](docs/) – diagrame și capturi
 
-1. **Hardware:** Senzor VL53L0X + Microcontroler (Arduino/RPi).
-2. **Software:** Python pentru preprocesare și TensorFlow/Keras pentru modelul neuronal (MLP).
-3. **Flux date:** Senzor -> Procesare Serială -> Preprocesare -> Rețea Neuronală -> Distanță Estimată.
-
----
-
-##  1. Structura Repository-ului Github (versiunea Etapei 3)
-
-```
-project-name/
-├── README.md
-├── docs/
-│   └── datasets/          # descriere seturi de date, surse, diagrame
-├── data/
-│   ├── raw/               # date brute
-│   ├── processed/         # date curățate și transformate
-│   ├── train/             # set de instruire
-│   ├── validation/        # set de validare
-│   └── test/              # set de testare
-├── src/
-│   ├── preprocessing/     # funcții pentru preprocesare
-│   ├── data_acquisition/  # generare / achiziție date (dacă există)
-│   └── neural_network/    # implementarea RN (în etapa următoare)
-├── config/                # fișiere de configurare
-└── requirements.txt       # dependențe Python (dacă aplicabil)
-```
-<img width="603" height="662" alt="image" src="https://github.com/user-attachments/assets/9c80709a-8f99-4ce3-9085-6f4cfc7d563f" />
- 
----
-
-## Documentație dataset
-
-- Descriere detaliată și instrucțiuni de preprocesare: [data/README.md](data/README.md)
-- Analiză și pregătire (Etapa 3): [docs/etapa3.md](docs/etapa3.md)
-- Arhitectura aplicației (Etapa 4): [README_Etapa4_Arhitectura_SIA.md](README_Etapa4_Arhitectura_SIA.md)
-- Antrenare model (Etapa 5): [README_Etapa5_Antrenare_RN.md](README_Etapa5_Antrenare_RN.md)
-- Optimizare și concluzii (Etapa 6): [etapa6_optimizare_concluzii.md](etapa6_optimizare_concluzii.md)
-- Schelet proiect: am adăugat scripturi de generare, preprocesare, model, training/eval și UI stub. Vezi `src/` și `data/`.
+## Documentație detaliată
+- [data/README.md](data/README.md)
+- [docs/etapa3.md](docs/etapa3.md)
+- [README_Etapa4_Arhitectura_SIA.md](README_Etapa4_Arhitectura_SIA.md)
+- [README_Etapa5_Antrenare_RN.md](README_Etapa5_Antrenare_RN.md)
+- [etapa6_optimizare_concluzii.md](etapa6_optimizare_concluzii.md)
+- [NUME_Prenume_Grupa_README_Proiect_RN.md](NUME_Prenume_Grupa_README_Proiect_RN.md)
 
 ---
 

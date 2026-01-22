@@ -1,6 +1,21 @@
 """Basic feature engineering for TOF dataset.
 Usage: python src/preprocessing/feature_engineering.py
 """
+# -----------------------------------------------------------------------------
+# Modul: src/preprocessing/feature_engineering.py
+# Scop: adaugă feature‑uri derivate (erori față de referință).
+# Input: data/processed/cleaned.csv.
+# Output: data/processed/combined.csv.
+# Utilizare: python src/preprocessing/feature_engineering.py
+# Pași principali:
+#   1) Calcul distance_error.
+#   2) Calcul distance_abs_error.
+#   3) Salvare dataset cu feature‑uri noi.
+# Dependențe: pandas.
+# Parametri implicați: distance_raw, distance_ref.
+# Fișiere scrise: data/processed/combined.csv.
+# Observații: folosit înainte de procesarea finală.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 from pathlib import Path

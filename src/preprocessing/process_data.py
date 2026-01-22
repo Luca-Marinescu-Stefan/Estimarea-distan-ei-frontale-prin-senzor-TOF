@@ -1,4 +1,19 @@
 """Curățare + normalizare date și salvare parametri de preprocesare."""
+# -----------------------------------------------------------------------------
+# Modul: src/preprocessing/process_data.py
+# Scop: curățare, clipare outlieri și standardizare pe features.
+# Input: data/processed/combined.csv.
+# Output: data/processed/combined.csv + config/preprocessing_params.*.
+# Utilizare: python src/preprocessing/process_data.py
+# Pași principali:
+#   1) Filtrare coloane relevante.
+#   2) Tratare lipsuri + duplicate.
+#   3) Clipare percentile 1–99%.
+# Dependențe: pandas, numpy, scikit-learn.
+# Parametri implicați: lower_q, upper_q, feature_cols.
+# Fișiere scrise: config/preprocessing_params.json, .pkl.
+# Observații: salvează scalerul pentru inferență consistentă.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 import json

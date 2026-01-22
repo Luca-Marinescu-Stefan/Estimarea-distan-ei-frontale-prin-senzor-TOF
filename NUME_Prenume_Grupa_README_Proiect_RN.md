@@ -426,12 +426,12 @@ Aș extinde colectarea de date reale pentru a valida modelul în condiții indus
 
 ### Repository și Documentație
 
-- [ ] **README.md** complet
+- [x] **README.md** complet
 - [x] **README-uri etape** prezente
 - [x] **Screenshots** prezente în `docs/screenshots/`
 - [x] **Structura repository** conformă
 - [x] **requirements.txt** actualizat și funcțional
-- [ ] **Cod comentat** (minim 15% linii comentarii relevante)
+- [x] **Cod comentat** (minim 15% linii comentarii relevante)
 - [x] **Toate path-urile relative**
 
 ### Acces și Versionare

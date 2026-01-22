@@ -1,6 +1,21 @@
 """Clean combined dataset and save cleaned CSV.
 Usage: python src/preprocessing/data_cleaner.py
 """
+# -----------------------------------------------------------------------------
+# Modul: src/preprocessing/data_cleaner.py
+# Scop: elimină duplicate și valori lipsă din datasetul combinat.
+# Input: data/processed/combined.csv.
+# Output: data/processed/cleaned.csv.
+# Utilizare: python src/preprocessing/data_cleaner.py
+# Pași principali:
+#   1) Conversie numerică pentru coloane relevante.
+#   2) Eliminare duplicate.
+#   3) Drop NA pe coloane numerice.
+# Dependențe: pandas.
+# Parametri implicați: numeric_cols.
+# Fișiere scrise: data/processed/cleaned.csv.
+# Observații: pas intermediar înainte de feature engineering.
+# -----------------------------------------------------------------------------
 from __future__ import annotations
 
 from pathlib import Path
