@@ -38,7 +38,7 @@ Proiectul implementează un sistem inteligent pentru estimarea distanței fronta
 - [README_Etapa4_Arhitectura_SIA.md](README_Etapa4_Arhitectura_SIA.md)
 - [README_Etapa5_Antrenare_RN.md](README_Etapa5_Antrenare_RN.md)
 - [etapa6_optimizare_concluzii.md](etapa6_optimizare_concluzii.md)
-- [NUME_Prenume_Grupa_README_Proiect_RN.md](NUME_Prenume_Grupa_README_Proiect_RN.md)
+- [Marinescu_Luca_634AB_README_Proiect_RN.md](Marinescu_Luca_634AB_README_Proiect_RN.md)
 
 ---
 
